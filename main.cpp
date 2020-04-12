@@ -142,13 +142,14 @@ void mostrarColaPrioridad(const int tamano)
         case MenuCola::AGREGAR:
             cout << "Ingrese numero para cola: ";
             cin >> num;
-            int prioridad;
+/*          int prioridad;
             cout << "Ingrese prioridad en la cola: ";
             cin >> prioridad;
-            cola.add(num, prioridad);
+*/
+            cola.add(num);
             break;
         case MenuCola::REMOVER:
-            cola.remove(num);
+            cola.pop();
             break;
         case MenuCola::VACIAR:
             cola.clear();
@@ -207,7 +208,7 @@ void mostrarColaSimple(const int tamano)
             cola.add(num);
             break;
         case MenuCola::REMOVER:
-            cola.remove(num);
+            cola.remove();
             break;
         case MenuCola::VACIAR:
             cola.clear();
@@ -226,6 +227,7 @@ void mostrarColaSimple(const int tamano)
             break;
         }
         esValida = false;
+        cout << "\n";
     }
 }
 bool haSalido()

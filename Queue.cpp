@@ -5,13 +5,12 @@
 #include <string>
 using std::fstream;
 using std::string;
-Queue::Queue(const int n) : IOInterface("numbers.txt")
+Queue::Queue(const size_t n) : IOInterface("numbers.txt")
 {
-    size = n;
-    queueArray = new int[size];
-    front = -1;
+    count = front = 0;
     rear = -1;
-    setNumItems(0);
+    capacity = n;
+    data = new int[n];
     try
     {
         read();
@@ -24,84 +23,67 @@ Queue::Queue(const Queue &obj)
 {
     front = obj.front;
     rear = obj.rear;
-    setNumItems(obj.getNumItems());
-    size = obj.size;
-    queueArray = new int[size];
-    for (int i = 0; i < size; ++i)
+    capacity = obj.capacity;
+    count = obj.count;
+    data = new int[capacity];
+    isSorted = obj.isSorted;
+    for (size_t i = 0; i < count; ++i)
     {
-        queueArray[i] = obj.queueArray[i];
+        data[i] = obj.data[i];
     }
 }
-Queue::~Queue()
-{
-    delete[] queueArray;
-}
-int Queue::getFront() const
-{
-    return front;
-}
-void Queue::setFront(int frontIndex)
 
+int Queue::getFront()
 {
-    front = frontIndex;
-}
+    return data[front];
+};
 
-int Queue::getRear() const
+void Queue::add(const int num)
 {
-    return rear;
-}
-void Queue::setRear(int rearIndex)
-{
-    rear = rearIndex;
-}
-int Queue::getFirst() const
-{
-    return queueArray[front];
-}
-bool Queue::isEmpty()
-{
-    return (getNumItems() <= 0);
-}
-bool Queue::isFull()
-{
-    return (getNumItems() >= size);
-}
-void Queue::add(int num)
-{
-    if (!isFull())
+    if (isFull())
     {
-        // Calcula la nueva posicion de la cola.
-        rear = (rear + 1) % size;
-        queueArray[rear] = num;
-        setNumItems(getNumItems() + 1);
-        if (!isEmpty())
-        {
-            write();
-        }
+        return;
+    }
+    else
+    {
+        rear = (rear + 1) % capacity;
+        data[rear] = num;
+        count++;
+        write();
+        isSorted = false;
     }
 }
-void Queue::remove(int &num)
+void Queue::remove()
 {
-    if (!isEmpty())
+    if (isEmpty())
     {
-        front = (front + 1) % size; // Calcula con cual es congruente en Z sub
-        size;
-        num = queueArray[front];
-        setNumItems(getNumItems() - 1);
+        return;
+    }
+    else
+    {
+        front = (front + 1) % capacity;
+        count--;
         write();
     }
 }
 void Queue::clear()
 {
-    front = size - 1;
-    rear = size - 1;
-    setNumItems(0);
+    front = 0;
+    rear = -1;
     write();
 }
-// Binary search.
 int Queue::search(const int num)
 {
-    sort();
+    int position = rear;
+    if (position > -1)
+    {
+        position = (isSorted) ? binarySearch(num) : linearSearch(num);
+    }
+    return position;
+}
+
+int Queue::binarySearch(const int num)
+{
     int first = front,
         last = rear,
         middle,
@@ -110,18 +92,34 @@ int Queue::search(const int num)
     while (!isFound && first <= last)
     {
         middle = (first + last) / 2;
-        if (queueArray[middle] == num)
+        if (data[middle] == num)
         {
             isFound = true;
             position = middle;
         }
-        else if (queueArray[middle] > num)
+        else if (data[middle] > num)
             last = middle - 1;
         else
             first = middle + 1;
     }
     return position;
 }
+
+int Queue::linearSearch(const int num)
+{
+    int position = -1;
+    for (size_t i = front; i <= rear; i++)
+    {
+        if (data[i] == num)
+        {
+            position = i;
+            break;
+        }
+    }
+
+    return position;
+}
+
 // Sort by selection sorting.
 void Queue::sort()
 {
@@ -129,28 +127,30 @@ void Queue::sort()
     for (startScan = front; startScan < (rear - 1); startScan++)
     {
         minIndex = startScan;
-        minValue = queueArray[startScan];
-        for (int index = startScan + 1; index < size; index++)
+        minValue = data[startScan];
+        for (int index = startScan + 1; index < count; index++)
         {
-            if (queueArray[index] < minValue)
+            if (data[index] < minValue)
             {
-                minValue = queueArray[index];
+                minValue = data[index];
                 minIndex = index;
             }
         }
-        queueArray[minIndex] = queueArray[startScan];
-        queueArray[startScan] = minValue;
+        data[minIndex] = data[startScan];
+        data[startScan] = minValue;
     }
+    isSorted = true;
 }
 // Show all elements in my queue.
 std::string Queue::toString()
 {
-    std::string mensaje = "Los elementos en la cola son: ";
-    if (front != -1)
+    std::string mensaje = "";
+    if (count > 0)
     {
+        mensaje = "Los elementos en la cola son: ";
         for (int i = front; i <= rear; ++i)
         {
-            mensaje.append(queueArray[i] + " ");
+            mensaje.append(data[i] + " ");
         }
     }
     else
@@ -166,7 +166,7 @@ void Queue::write()
     file.open(getFilename(), std::ios::out);
     if (!file.fail())
     {
-        if (front == -1)
+        if (count == 0)
         {
             file << "";
         }
@@ -174,7 +174,7 @@ void Queue::write()
         {
             for (int i = front; i <= rear; ++i)
             {
-                file << queueArray[i] << "\r\n";
+                file << data[i] << "\r\n";
             }
         }
     }

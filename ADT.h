@@ -5,30 +5,34 @@
 #include <string>
 class ADT
 {
-private:
-    int datum;
-    //std::vector<int> persist;
-    int numItems; // counter
+protected:
+    int* data;
+    size_t capacity; // capacity
+    size_t count;
 public:
+    virtual ~ADT(){delete data;};
     virtual void add(const int) = 0;
-    virtual void remove(int &) = 0;
+    virtual void remove() = 0;
+    /*virtual void add(const int) = 0;
+    virtual void remove(int &);
+    virtual void remove();*/
     virtual std::string toString() = 0;
     virtual int search(const int) = 0;
     virtual void sort() = 0;
-    void setDatum(int data)
+
+    size_t getCapacity() const{ return capacity;}
+    size_t getCount() const{ return count;}
+/*    void setData(int data)
     {
-        datum = data;
+        data = data;
     }
-    int getDatum() const
+    int* getData() const
     {
-        return datum;
+        return data;
     }
-    void setNumItems(const int counter)
+    void setSize(const int counter)
     {
-        numItems = counter;
+        size = counter;
     }
-    int getNumItems() const
-    {
-        return numItems;
-    }
+*/
 };

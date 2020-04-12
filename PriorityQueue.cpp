@@ -6,16 +6,36 @@
 */
 // #include "stdafx.h" // Permite compilar en Visual Studio
 #include "PriorityQueue.h"
-PriorityQueue::PriorityQueue(const int size) : Queue(size)
+void PriorityQueue::add(const int num)
 {
-    priorities = new int[size];
-    numbers = new int[size];
+    if (!isFull())
+    {
+        if (isEmpty())
+        {
+            data[count++] = num;
+        } else
+        {
+            size_t i = 0;
+            // start from the right end of the queue
+            for (i = count - 1; i >= 0; --i)
+            {
+                // if data is larger, shift existing item to right end 
+                if (num > data[i])
+                {
+                    data[i + 1] = data[i];
+                }
+                else
+                {
+                    break;
+                }
+            }
+            data[i+1] = num;
+            count++;
+        }
+    }
+    
 }
-PriorityQueue::~PriorityQueue()
-{
-    delete[] priorities;
-    delete[] numbers;
-}
-void PriorityQueue::add(const int num, const int priority)
-{
+
+int PriorityQueue::pop(){
+   return data[--count];
 }

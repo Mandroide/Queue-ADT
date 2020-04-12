@@ -6,26 +6,23 @@
 class Queue : public ADT, IOInterface
 {
 private:
-    int *queueArray;
-    int size;
-    int front; // front
     int rear;  // rear
+    int binarySearch(const int num);
+    int linearSearch(const int num);
+protected:
+    int front;
+    bool isSorted;
 public:
-    Queue(const int size);
+    Queue(const size_t size);
     Queue(const Queue &);
-    ~Queue();
-    // Own
-    int getFront() const;
-    void setFront(int frontIndex);
-    int getRear() const;
-    void setRear(int rearIndex);
-    int getFirst() const;
-    bool isEmpty();
-    bool isFull();
+    // Ownss
+    int getFront();
+    bool isEmpty(){ return count == 0;};
+    bool isFull(){ return count == capacity;};
     void clear();
+    virtual void add(const int num) override; //enqueue
+    virtual void remove() override;  // dequeue
     // Inherited.
-    virtual void add(const int) override; //enqueue
-    virtual void remove(int &) override;  // dequeue
     virtual void read() override;
     virtual int search(const int) override;
 

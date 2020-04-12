@@ -2,16 +2,17 @@
 #define PRIORITYQUEUE_H
 #include "Queue.h"
 #include <vector>
+/*
+    Assuming that data with high value has low priority
+*/
 class PriorityQueue : public Queue
 {
 
 public:
-    PriorityQueue(const int size);
-    ~PriorityQueue();
-    void add(const int, const int);
-
+    PriorityQueue(const size_t n) : Queue(n){
+    }
+    void add(const int num) override;
+    int pop();
 private:
-    void add(const int num) {}
-    int *priorities;
-    int *numbers;
+    using Queue::remove;
 };
